@@ -1,22 +1,15 @@
 import datetime
 
 class Account:
-    def __init__(self, title:str, acct_type:str):
+    def __init__(self, title:str):
         self.title = title
-        self.acct_type = acct_type
         self.ledger = f'/ledger/{title}.txt'
         self.cr_bal = 0
         self.dr_bal = 0
         self.bal_type = 'CR'
-    
-    def is_as(self):
-        return self.acct_type == 'AS'
-    
-    def is_li(self):
-        return self.acct_type == 'LI'
-    
-    def is_se(self):
-        return self.acct_type == 'SE'
+
+    def __str__(self):
+        return f"Account: {self.title}\nDebits: {self.dr_bal}\nCredits: {self.cr_bal}"
     
     def cr(self, amount:float, date:datetime.date=datetime.date.today().strftime('%b. %d %Y')):
         date = date.strftime('%b. %d %Y')
