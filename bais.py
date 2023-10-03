@@ -1,8 +1,8 @@
-import datetime
+from datetime import date
+from account import Account
+from transaction import Transaction
 import os
 import inquirer
-import account
-import transaction
 
 print("""
 +--------------------------------------------------+
@@ -28,14 +28,29 @@ dr_accts = []
 cr_accts = []
 
 for choice in dr_choice:
-    dr_accts.append(account.Account(choice[0:choice.index(".")]))
+    dr_accts.append(Account(choice[0:choice.index(".")]))
 
 for choice in cr_choice:
-    cr_accts.append(account.Account(choice[0:choice.index(".")]))
+    cr_accts.append(Account(choice[0:choice.index(".")]))
 
 # Change all of the ledger files to .csv and put headers in every one
 
-trans_amnt = input("How much money will move between these accounts?\n>>>$")
+dr_amnts = []
+cr_amnts = []
+
+for acct in dr_accts:
+    dr_amnts.append(
+        int(
+            input(f"Enter amount being debited to/from {acct.acct_title()}\n>>>$")
+        )
+    )
+
+for acct in cr_accts:
+    cr_amnts.append(
+        int(
+            input(f"Enter amount being credited to/from {acct.acct_title()}\n>>>$")
+        )
+    )
 
 print("When did this transaction occur?\nPlease enter in mm-dd-yyyy format.\n(Leave blank if today)")
 
@@ -43,36 +58,26 @@ month = input(">mm>>")
 day = input(">dd>>")
 year = input(">yyyy>>")
 
-print(f"'{month}'")
-print(f"'{day}'")
-print(f"'{year}'")
+today = date.today()
 
 if month == "":
-    month = datetime.date.today().month
+    month = today.month
 if year == "":
-    year = datetime.date.today().year
+    year = today.year
 if day == "":
-    day = datetime.date.today().day
+    day = today.day
 
-trans_date = datetime.date(int(year), int(month), int(day)).strftime('%b. %d %Y')
+trans_date = date(int(year), int(month), int(day))
+
+# Create transaction
+transaction = Transaction(dr_accts, cr_accts, dr_amnts, cr_amnts, trans_date)
 
 # Journalize the transaction
-
-# Modify Transaction to use lists of accounts, instead of singletons
-eco_event = transaction.Transaction()
-
-# with open("general_journal.csv", "a+") as journal:
-#     journal.writelines(f"{trans_date},{dr_acct},{cr_acct},${trans_amnt}\n")
+transaction.journalize(input("(optional) Explanation for entry\n>>>"))
 
 # Post to ledger accounts
-with open(f"ledger/{dr_acct}.txt", "a+") as dr_ledger:
-    dr_ledger.writelines(f"{trans_date},{trans_amnt},\n")
-
-with open(f"ledger/{cr_acct}.txt", "a+") as cr_ledger:
-    cr_ledger.writelines(f"{trans_date},,{trans_amnt}\n")
+transaction.post()
 
 # Prepare a trial balance
-# Yeah we're going to need a list of acct's for users to select from
-# Loop through the list
 # apply a "get ledger bal" function
 # put that into 
