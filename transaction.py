@@ -47,10 +47,6 @@ class Transaction:
         else:
             self.explanation = explanation
 
-        print(self.dr_items())
-        print(self.cr_items())
-        print(f"{self.date}{self.dr_items()}{self.cr_items()}")
-
         with open(self.default_journal, "a+") as journal:
             journal.writelines(f"{self.date}{self.dr_items()}{self.cr_items()},({self.explanation})\n")
 

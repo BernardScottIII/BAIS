@@ -9,8 +9,13 @@ print("""
 | Starting Bernard's Accounting Information System |
 +--------------------------------------------------+""")
 
-files = os.listdir("ledger/")
-dr_choice = inquirer.checkbox("Which account are you debiting?", choices=files)
+accts = os.listdir("ledger/")
+files = []
+for acct in accts:
+    for file in os.listdir(f"ledger/{acct}"):
+        files.append(file)
+
+dr_choice = inquirer.checkbox("Which account(s) are you debiting?", choices=files)
 for acct in dr_choice:
     files.remove(acct)
 
@@ -19,7 +24,7 @@ cr_choice = [""]
 if len(dr_choice) > 1:
     cr_choice[0] = inquirer.list_input("Which account are you crediting?", choices=files)
 else:
-    cr_choice = inquirer.checkbox("Which account are you crediting?", choices=files)
+    cr_choice = inquirer.checkbox("Which account(s) are you crediting?", choices=files)
 
 for acct in cr_choice:
     files.remove(acct)
@@ -28,10 +33,18 @@ dr_accts = []
 cr_accts = []
 
 for choice in dr_choice:
-    dr_accts.append(Account(choice[0:choice.index(".")]))
+    acc_type = ""
+    for acct in accts:
+        if os.path.isfile(f"ledger/{acct}/{choice}"):
+            acc_type = acct
+    dr_accts.append(Account(acc_type, choice[0:choice.index(".")]))
 
 for choice in cr_choice:
-    cr_accts.append(Account(choice[0:choice.index(".")]))
+    acc_type = ""
+    for acct in accts:
+        if os.path.isfile(f"ledger/{acct}/{choice}"):
+            acc_type = acct
+    cr_accts.append(Account(acc_type, choice[0:choice.index(".")]))
 
 # Change all of the ledger files to .csv and put headers in every one
 
@@ -79,5 +92,3 @@ transaction.journalize(input("(optional) Explanation for entry\n>>>"))
 transaction.post()
 
 # Prepare a trial balance
-# apply a "get ledger bal" function
-# put that into 
