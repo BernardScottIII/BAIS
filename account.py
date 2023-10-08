@@ -6,7 +6,7 @@ class Account:
         self.ledger = f'ledger/{title}.txt'
         self.cr_bal = 0
         self.dr_bal = 0
-        self.bal_is_cr = True
+        self.is_norm_bal = True
 
     def __str__(self):
         return f"Account: {self.title}\nDebits: {self.dr_bal}\nCredits: {self.cr_bal}"
@@ -27,16 +27,16 @@ class Account:
         debits = self.dr_bal
         credits = self.cr_bal
         if debits > credits:
-            self.bal_is_cr = False
+            self.is_norm_bal = False
             return debits - credits
         elif credits > debits:
-            self.bal_is_cr = True
+            self.is_norm_bal = True
             return credits - debits
         else:
             return 0
 
     def bal_type(self):
-        return self.bal_is_cr
+        return self.is_norm_bal
     
     def acct_title(self):
         return self.title
