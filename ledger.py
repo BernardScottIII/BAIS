@@ -1,19 +1,32 @@
 from account import Account
-from transaction import Transaction
-from datetime import date
 import os
+import csv
 
 class Ledger:
     def __init__(self,
                  filepath:os.path,
-                 breakdown:os.path.__file__):
+                 breakdown:str):
+        
+        self.asset_accounts = []
+        self.liability_accounts = []
+        self.se_accounts = []
+
+        types = [self.asset_accounts, self.liability_accounts, self.se_accounts]
+
+        with open(breakdown, "r") as bd:
+            i = 0
+            for row in csv.reader(bd):
+                print(row)
+                types[i].extend(row)
+                print(types[i])
+                i += 1
+
         self.categories = os.listdir(f"{filepath}/")
         self.accounts = []
         for category in self.categories:
             for acct in os.listdir(f"{filepath}/{category}"):
                 debit_is_nomral = False
-                if category in asset_accts:
-                    """        ^^ Some list of acct's """
+                if category in self.asset_accounts:
                     debit_is_nomral = True
                 
                 self.accounts.append(Account(category, acct[0:acct.index(".")], debit_is_nomral))

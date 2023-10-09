@@ -1,9 +1,6 @@
 from datetime import date
 
 class Account:
-    # The Account object currently has no way of knowing what
-    # it's normal balance type is
-    # (Doesn't know if debit balance or credit balance is it's "normal balance")
     def __init__(self, acc_type:str, title:str, dr_norm:bool=False):
         self.title = title
         self.ledger = f'ledger/{acc_type}/{title}.txt'
