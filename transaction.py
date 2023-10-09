@@ -51,11 +51,20 @@ class Transaction:
         with open(self.default_journal, "a+") as journal:
             journal.writelines(f"{self.date}{self.dr_items()}{self.cr_items()},({self.explanation})\n")
 
-    def post(self, ledger:Ledger):
+    def post(self):
         for item in self.acct_dr:
             item.account().dr(item.amount(), self.date)
         for item in self.acct_cr:
             item.account().cr(item.amount(), self.date)
+        
+    def summarize(self):
+        result = "Transaction: "
+        for item in self.acct_dr:
+            result += f"{item.title()}"
+        result += " <==> "
+        for item in self.acct_cr:
+            result += f"{item.title()}"
+        return result
 
 class Item:
     def __init__(self,

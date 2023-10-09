@@ -1,8 +1,8 @@
 Account,Debit,Credit
 accounts_receivable,0,
-cash,,500
-equipment,200,
-inventory,300,
+cash,10000,
+equipment,0,
+inventory,0,
 prepaid_insurance,0,
 supplies,0,
 accumulated_depreciation,0,
@@ -21,6 +21,6 @@ unearned_rent,,0
 unearned_service_revenue,,0
 earned_revenue,0,
 service_revenue,0,
-common_stock,,0
+common_stock,10000,
 retained_earnings,,0
-Totals,500,500
+Totals,20000,0
