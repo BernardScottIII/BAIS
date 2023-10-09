@@ -163,4 +163,3 @@ cython_debug/
 ledger/
 general_journal.csv
 trial_balance.csv
-ledger_breakdown.csv

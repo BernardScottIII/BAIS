@@ -1,6 +1,5 @@
 from datetime import date
 from account import Account
-from ledger import Ledger
 
 class Transaction:
     def __init__(self,

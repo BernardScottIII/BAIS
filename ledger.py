@@ -1,19 +1,17 @@
 from account import Account
 import os
 import csv
-import copy
 
 class Ledger:
     def __init__(self,
                  filepath:os.path,
-                 breakdown:str,
-                 journal:str="general_journal.csv"):
+                 breakdown:str):
         
+        # Take rows from breakdown and relate them to a part of the basic
+        # accounting equation
         self.asset_accounts = []
         self.liability_accounts = []
         self.se_accounts = []
-
-        self.journal = journal
 
         types = [self.asset_accounts, self.liability_accounts, self.se_accounts]
 
@@ -23,30 +21,32 @@ class Ledger:
                 types[i].extend(row)
                 i += 1
 
+        # Created to help break down ledger files
         self.categories = os.listdir(f"{filepath}/")
+        
+        # Make each file in the ledger filepath its own Account object
         self.accounts = []
+
+        # Created for re-ordering accounts when order is broken
         self.sorted_order = []
+
         for category in self.categories:
             for acct in os.listdir(f"{filepath}/{category}"):
-                debit_is_nomral = False
-                if category in self.asset_accounts:
-                    debit_is_nomral = True
-                
-                self.accounts.append(Account(category, acct[0:acct.index(".")], debit_is_nomral))
+                self.accounts.append(Account(category, acct[0:acct.index(".")]))
                 self.sorted_order.append(acct[0:acct.index(".")])
 
+    # Return list[str] of title of every account in every category in ledger
     def list_acct_titles(self):
         result = []
         for acct in self.accounts:
             result.append(f"{acct.acct_title()}")
         return result
     
+    # Return reference to list of accounts in ledger
     def get_accts(self):
         return self.accounts
     
-    def get_categories(self):
-        return copy.deepcopy(self.categories)
-    
+    # Create current trial balance with every account in ledger
     def get_trial_bal(self):
         with open("trial_balance.csv", "w", newline="") as tb:
             writer = csv.writer(tb)
@@ -74,10 +74,8 @@ class Ledger:
                         writer.writerow([acct.acct_title(),None,(cr_bal - dr_bal)])
                         cr_total += (cr_bal - dr_bal)
             writer.writerow(["Totals",dr_total,cr_total])
-                
-
-
     
+    # Sort list of accounts back into original order
     def original_sort(self, acct:Account):
         if acct.acct_title() in self.sorted_order:
             return self.sorted_order.index(acct.acct_title())
