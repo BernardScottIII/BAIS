@@ -1,4 +1,4 @@
-import datetime
+from datetime import date
 from account import Account
 
 class Transaction:
@@ -7,7 +7,7 @@ class Transaction:
                  acct_cr:Account,
                  dr_amnts,
                  cr_amnts,
-                 date:datetime.date=datetime.date.today().strftime('%b. %d %Y'),
+                 date:date=date.today().strftime('%b. %d %Y'),
                  explanation:str='unexplained entry',
                  default_journal:str='general_journal.csv'):
         

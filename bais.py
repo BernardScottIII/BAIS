@@ -1,6 +1,7 @@
 from datetime import date
 from account import Account
 from transaction import Transaction
+from ledger import Ledger
 import os
 import inquirer
 
@@ -9,45 +10,27 @@ print("""
 | Starting Bernard's Accounting Information System |
 +--------------------------------------------------+""")
 
-accts = os.listdir("ledger/")
-files = []
-for acct in accts:
-    for file in os.listdir(f"ledger/{acct}"):
-        files.append(file)
+# Create a Ledger object and tell it where all accounts are categorized and stored
+general_ledger = Ledger("ledger")
 
-dr_choice = inquirer.checkbox("Which account(s) are you debiting?", choices=files)
-for acct in dr_choice:
-    files.remove(acct)
+options = general_ledger.get_accts()
 
-cr_choice = [""]
+# Print accounts for user to choose to debit or credit
+dr_accts = inquirer.checkbox("Which account(s) are you debiting?", choices=options)
 
-if len(dr_choice) > 1:
-    cr_choice[0] = inquirer.list_input("Which account are you crediting?", choices=files)
+# Prevent user from crediting same account being debited
+for acct in dr_accts:
+    options.remove(acct)
+
+cr_accts = [""]
+
+# Logic to prevent user debiting AND crediting multiple accounts in single transaction
+if len(dr_accts) > 1:
+    cr_accts[0] = inquirer.list_input("Which account are you crediting?", choices=options)
 else:
-    cr_choice = inquirer.checkbox("Which account(s) are you crediting?", choices=files)
+    cr_choice = inquirer.checkbox("Which account(s) are you crediting?", choices=options)
 
-for acct in cr_choice:
-    files.remove(acct)
-
-dr_accts = []
-cr_accts = []
-
-for choice in dr_choice:
-    acc_type = ""
-    for acct in accts:
-        if os.path.isfile(f"ledger/{acct}/{choice}"):
-            acc_type = acct
-    dr_accts.append(Account(acc_type, choice[0:choice.index(".")]))
-
-for choice in cr_choice:
-    acc_type = ""
-    for acct in accts:
-        if os.path.isfile(f"ledger/{acct}/{choice}"):
-            acc_type = acct
-    cr_accts.append(Account(acc_type, choice[0:choice.index(".")]))
-
-# Change all of the ledger files to .csv and put headers in every one
-
+# Collect amounts user is debiting and crediting from each account
 dr_amnts = []
 cr_amnts = []
 
@@ -65,6 +48,7 @@ for acct in cr_accts:
         )
     )
 
+# Get other transaction information, like date and explanation
 print("When did this transaction occur?\nPlease enter in mm-dd-yyyy format.\n(Leave blank if today)")
 
 month = input(">mm>>")
@@ -82,13 +66,35 @@ if day == "":
 
 trans_date = date(int(year), int(month), int(day))
 
-# Create transaction
+# Create Transaction object
 transaction = Transaction(dr_accts, cr_accts, dr_amnts, cr_amnts, trans_date)
 
-# Journalize the transaction
+# Journalize the transaction and add optional explanation
 transaction.journalize(input("(optional) Explanation for entry\n>>>"))
 
-# Post to ledger accounts
+# Post transaction to ledger accounts
 transaction.post()
 
 # Prepare a trial balance
+general_ledger.get_trial_bal()
+for category in general_ledger.get_categories():
+    for acct in os.listdir(f"ledger/{category}"):
+        
+        # Sum up all of debits
+        dr_sum = 0
+        with open(f"ledger/{category}/{acct}") as ledger:
+            for line in ledger:
+                # This line sucks
+                dr_sum += int(line[line.index(",")+1:line.index(",",line.index(",")+1)])
+
+        # Sum up all of credits
+
+        # Get difference of dr-cr
+
+        # If +, dr bal
+        # If -, cr bal
+
+        # report abs. val. and bal type
+
+# List accts and balances in order
+# Check if dr's == cr's
