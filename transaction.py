@@ -60,10 +60,10 @@ class Transaction:
     def summarize(self):
         result = "Transaction: "
         for item in self.acct_dr:
-            result += f"{item.title()}"
+            result += f"{item.title()}, "
         result += " <==> "
         for item in self.acct_cr:
-            result += f"{item.title()}"
+            result += f"{item.title()}, "
         return result
 
 class Item:

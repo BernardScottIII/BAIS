@@ -162,3 +162,5 @@ cython_debug/
 # Contains accounting records
 ledger/
 general_journal.csv
+trial_balance.csv
+ledger_breakdown.csv
