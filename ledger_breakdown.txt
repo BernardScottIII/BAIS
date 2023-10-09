@@ -1,0 +1,3 @@
+asset accounts
+liability accounts
+stockholder equity accounts
