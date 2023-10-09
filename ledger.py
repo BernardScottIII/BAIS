@@ -6,9 +6,7 @@ import os
 class Ledger:
     def __init__(self,
                  filepath:os.path,
-                 asset_accts:list,
-                 liability_accts:list,
-                 se_accts:list):
+                 breakdown:os.path.__file__):
         self.categories = os.listdir(f"{filepath}/")
         self.accounts = []
         for category in self.categories:

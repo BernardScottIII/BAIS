@@ -11,11 +11,7 @@ print("""
 +--------------------------------------------------+""")
 
 # Create a Ledger object and tell it where all accounts are categorized and stored
-general_ledger = None
-with open("ledger_breakdown.txt", "r") as breakdown:
-    lines = breakdown.readlines()
-    print(f"{lines[0]}{lines[1]}{lines[2]}")
-    general_ledger = Ledger("ledger", lines[0], lines[1], lines[2])
+general_ledger = Ledger("ledger", "ledger_breakdown.csv")
 
 options = general_ledger.get_accts()
 
