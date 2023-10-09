@@ -1,12 +1,13 @@
 from datetime import date
 from account import Account
+from ledger import Ledger
 
 class Transaction:
     def __init__(self,
                  acct_dr:Account,
                  acct_cr:Account,
-                 dr_amnts,
-                 cr_amnts,
+                 dr_amnts:list,
+                 cr_amnts:list,
                  date:date=date.today().strftime('%b. %d %Y'),
                  explanation:str='unexplained entry',
                  default_journal:str='general_journal.csv'):
@@ -50,11 +51,11 @@ class Transaction:
         with open(self.default_journal, "a+") as journal:
             journal.writelines(f"{self.date}{self.dr_items()}{self.cr_items()},({self.explanation})\n")
 
-    def post(self):
-        for acct in self.acct_dr:
-            acct.account().dr(acct.amount(), self.date)
-        for acct in self.acct_cr:
-            acct.account().cr(acct.amount(), self.date)
+    def post(self, ledger:Ledger):
+        for item in self.acct_dr:
+            item.account().dr(item.amount(), self.date)
+        for item in self.acct_cr:
+            item.account().cr(item.amount(), self.date)
 
 class Item:
     def __init__(self,

@@ -1,8 +1,6 @@
 from datetime import date
-from account import Account
 from transaction import Transaction
 from ledger import Ledger
-import os
 import inquirer
 
 print("""
@@ -13,6 +11,7 @@ print("""
 # Create a Ledger object and tell it where all accounts are categorized and stored
 general_ledger = Ledger("ledger", "ledger_breakdown.csv")
 
+# Create local reference to general ledger's list of accounts
 options = general_ledger.get_accts()
 
 # Print accounts for user to choose to debit or credit
@@ -29,6 +28,11 @@ if len(dr_accts) > 1:
     cr_accts[0] = inquirer.list_input("Which account are you crediting?", choices=options)
 else:
     cr_choice = inquirer.checkbox("Which account(s) are you crediting?", choices=options)
+
+# Replace removed options in general ledger
+for acct in dr_accts:
+    options.append(acct)
+options.sort(key=general_ledger.original_sort)
 
 # Collect amounts user is debiting and crediting from each account
 dr_amnts = []
@@ -48,7 +52,7 @@ for acct in cr_accts:
         )
     )
 
-# Get other transaction information, like date and explanation
+# Get other transaction information, including date and explanation
 print("When did this transaction occur?\nPlease enter in mm-dd-yyyy format.\n(Leave blank if today)")
 
 month = input(">mm>>")
@@ -72,29 +76,8 @@ transaction = Transaction(dr_accts, cr_accts, dr_amnts, cr_amnts, trans_date)
 # Journalize the transaction and add optional explanation
 transaction.journalize(input("(optional) Explanation for entry\n>>>"))
 
-# Post transaction to ledger accounts
-transaction.post()
+# Post transaction to the general ledger
+transaction.post(general_ledger)
 
 # Prepare a trial balance
 general_ledger.get_trial_bal()
-for category in general_ledger.get_categories():
-    for acct in os.listdir(f"ledger/{category}"):
-        
-        # Sum up all of debits
-        dr_sum = 0
-        with open(f"ledger/{category}/{acct}") as ledger:
-            for line in ledger:
-                # This line sucks
-                dr_sum += int(line[line.index(",")+1:line.index(",",line.index(",")+1)])
-
-        # Sum up all of credits
-
-        # Get difference of dr-cr
-
-        # If +, dr bal
-        # If -, cr bal
-
-        # report abs. val. and bal type
-
-# List accts and balances in order
-# Check if dr's == cr's

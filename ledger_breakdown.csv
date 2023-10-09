@@ -1,3 +1,3 @@
-list,of,asset,accounts
-list,of,liability,accounts
-list,of,stockholders',equity,accounts
+assets,contra_asset,contra_revenue,revenues
+expenses,liabilities
+dividends,sotckholders_equity
