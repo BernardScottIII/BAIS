@@ -51,10 +51,11 @@ class Ledger:
         with open("trial_balance.csv", "w", newline="") as tb:
             writer = csv.writer(tb)
             writer.writerow(["Account", "Debit", "Credit"])
+
             dr_total = 0
             cr_total = 0
             for acct in self.accounts:
-                print(acct.acct_title())
+                # Open each account's ledger
                 with open(acct.ledger, "r", newline="") as ledger:
                     reader = csv.reader(ledger)
 
@@ -63,16 +64,20 @@ class Ledger:
                     cr_bal = 0
                     for row in reader:
                         if row[1] != "":
-                            dr_bal += int(row[1])
+                            dr_bal += float(row[1])
                         else:
-                            cr_bal += int(row[2])
+                            cr_bal += float(row[2])
 
+                    # Determine if balance is debit or credit balance, and add
+                    # to trial_balance.csv accordingly
                     if dr_bal > cr_bal:
                         writer.writerow([acct.acct_title(),(dr_bal - cr_bal),None])
                         dr_total += (dr_bal - cr_bal)
                     else:
                         writer.writerow([acct.acct_title(),None,(cr_bal - dr_bal)])
                         cr_total += (cr_bal - dr_bal)
+            
+            # Write total debit and credit balances as last row
             writer.writerow(["Totals",dr_total,cr_total])
     
     # Sort list of accounts back into original order

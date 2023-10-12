@@ -160,6 +160,5 @@ cython_debug/
 #.idea/
 
 # Contains accounting records
-ledger/
-general_journal.csv
-trial_balance.csv
+# general_journal.csv
+# trial_balance.csv

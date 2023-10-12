@@ -1,10 +1,11 @@
 from datetime import date
 import copy
+import csv
 
 class Account:
     def __init__(self, acc_type:str, title:str):
         self.title = title
-        self.ledger = f'ledger/{acc_type}/{title}.txt'
+        self.ledger = f'ledger/{acc_type}/{title}.csv'
         self.cr_bal = 0
         self.dr_bal = 0
         self.type_of_acct = acc_type
@@ -14,13 +15,15 @@ class Account:
     
     def dr(self, amount:float, date:str=date.today().strftime('%b. %d %Y')):
         self.dr_bal += amount
-        with open(self.ledger, "a+") as ledger:
-            ledger.writelines(f"{date},{amount},,\n")
+        with open(self.ledger, "a+", newline="") as ledger:
+            writer = csv.writer(ledger)
+            writer.writerow([date,amount,"",""])
     
     def cr(self, amount:float, date:str=date.today().strftime('%b. %d %Y')):
         self.cr_bal += amount
-        with open(self.ledger, "a+") as ledger:
-            ledger.writelines(f",,{amount},{date}\n")
+        with open(self.ledger, "a+", newline="") as ledger:
+            writer = csv.writer(ledger)
+            writer.writerow(["","",amount, date])
 
     def bal(self):
         return abs(self.dr_bal-self.cr_bal)

@@ -44,14 +44,14 @@ def create_entry():
 
     for acct in dr_accts:
         dr_amnts.append(
-            int(
+            float(
                 input(f"Enter amount being debited to/from {acct.acct_title()}\n>>>$")
             )
         )
 
     for acct in cr_accts:
         cr_amnts.append(
-            int(
+            float(
                 input(f"Enter amount being credited to/from {acct.acct_title()}\n>>>$")
             )
         )
@@ -80,6 +80,7 @@ def create_entry():
     # Journalize the transaction and add optional explanation
     transaction.journalize(input("(optional) Explanation for entry\n>>>"))
 
+    # Add transaction to list of transactions to be posted to the ledger
     journal_entries.append(transaction)
 
 # Post all transactions to the general ledger
