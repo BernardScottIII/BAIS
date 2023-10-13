@@ -15,7 +15,7 @@ journal_entries = []
 # Create a Ledger object and tell it where all accounts are categorized and stored
 general_ledger = Ledger("ledger", "ledger_breakdown.csv")
 
-def create_entry():
+def create_entry(keyword:str):
     # Create local reference to general ledger's list of accounts
     options = general_ledger.get_accts()
 
@@ -58,7 +58,7 @@ def create_entry():
         )
 
     # Get other transaction information, including date and explanation
-    print("When did this transaction occur?\nPlease enter in mm-dd-yyyy format.\n(Leave blank if today)")
+    print(f"When did this {keyword} occur?\nPlease enter in mm-dd-yyyy format.\n(Leave blank if today)")
 
     month = input(">mm>>")
     day = input(">dd>>")
@@ -79,7 +79,7 @@ def create_entry():
     transaction = Transaction(dr_accts, cr_accts, dr_amnts, cr_amnts, trans_date)
 
     # Journalize the transaction and add optional explanation
-    transaction.journalize(input("(optional) Explanation for entry\n>>>"))
+    transaction.journalize(input(f"(optional) Explanation for {keyword}\n>>>"))
 
     # Add transaction to list of transactions to be posted to the ledger
     journal_entries.append(transaction)
@@ -88,10 +88,6 @@ def create_entry():
 def post_entries():
     for entry in journal_entries:
         entry.post()
-        print(entry.summarize())
-    
-def adjust_entry():
-    for entry in journal_entries:
         print(entry.summarize())
 
 # Helper function to convert three character month code into its integer
@@ -124,19 +120,25 @@ def m_str_to_int(month:str):
     else:
         return -1
 
-def import_entries(filename:str="general_journal.csv"):
+def import_entries(filename:str):
+
+    # Implementation of default value
+    # Using the "=" convention in the argument does not work for some reason.
     if filename == "":
         filename = "general_journal.csv"
-        
+
     with open(filename, "r", newline="") as journal:
         reader = csv.reader(journal)
 
+        # Create empty fields for transaction information
         dr_accts = []
         cr_accts = []
         dr_amnts = []
         cr_amnts = []
 
+        # Flag determining when complete transaction is read from journal
         trans_complete = False
+
         for row in reader:
             
             trans_date = date.today()
@@ -163,11 +165,17 @@ def import_entries(filename:str="general_journal.csv"):
                 cr_accts.append(general_ledger.find_acct(row[2]))
                 cr_amnts.append(float(row[5]))
 
+            # When the entire transaction has been read, create the object and
+            # add it to the global journal entries list 
             if trans_complete == True:
                 transaction = Transaction(dr_accts, cr_accts, dr_amnts, cr_amnts, trans_date, explanation)
                 print(f"Adding: {transaction.summarize()}")
                 journal_entries.append(transaction)
+
+                # Reset flag for new transaction
                 trans_complete = False
+
+                # Clear transaction information lists
                 dr_accts = []
                 cr_accts = []
                 dr_amnts = []
@@ -185,14 +193,14 @@ while choice != "Exit":
     choice = inquirer.list_input("Main Menu", choices=main_menu_options)
 
     if choice == "Create Journal Entry":
-        create_entry()
+        create_entry("transaction")
     elif choice == "Post all Journal Entries":
         post_entries()
     elif choice == "Prepare Trial Balance":
         general_ledger.get_trial_bal()
         print("Trial Balance Generated!")
     elif choice == "Adjust Journal Entries":
-        adjust_entry()
+        create_entry("adjustment")
     elif choice == "Import Journal Entries":
         file = input("Enter path/name of journal file (Default: general_journal.csv)\n>>>")
         import_entries(file)
