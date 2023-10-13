@@ -2,6 +2,7 @@ from datetime import date
 from transaction import Transaction
 from ledger import Ledger
 import inquirer
+import csv
 
 print("""
 +--------------------------------------------------+
@@ -89,11 +90,94 @@ def post_entries():
         entry.post()
         print(entry.summarize())
     
+def adjust_entry():
+    for entry in journal_entries:
+        print(entry.summarize())
+
+# Helper function to convert three character month code into its integer
+# equivalent
+def m_str_to_int(month:str):
+    if "Jan" in month:
+        return 1
+    elif "Feb" in month:
+        return 2
+    elif "Mar" in month:
+        return 3
+    elif "Apr" in month:
+        return 4
+    elif "May" in month:
+        return 5
+    elif "Jun" in month:
+        return 6
+    elif "Jul" in month:
+        return 7
+    elif "Aug" in month:
+        return 8
+    elif "Sep" in month:
+        return 9
+    elif "Oct" in month:
+        return 10
+    elif "Nov" in month:
+        return 11
+    elif "Dec" in month:
+        return 12
+    else:
+        return -1
+
+def import_entries(filename:str="general_journal.csv"):
+    if filename == "":
+        filename = "general_journal.csv"
+        
+    with open(filename, "r", newline="") as journal:
+        reader = csv.reader(journal)
+
+        dr_accts = []
+        cr_accts = []
+        dr_amnts = []
+        cr_amnts = []
+
+        trans_complete = False
+        for row in reader:
+            
+            trans_date = date.today()
+            explanation = ""
+
+            # For every row in the csv file
+            # Get the date at [0][0]
+            if row[0] != "":
+                year = int(row[0][7:])
+                month = m_str_to_int(row[0][:3])
+                day = int(row[0][5:7])
+                trans_date = date(year, month, day)
+
+            # If row[1] starts with '(', then an explanation is recorded
+            if row[1].find("(") != -1:
+                explanation = row[1][1:len(row[1])-1]
+                trans_complete = True
+            # If 2nd cell isn't empty, add a debit item
+            elif row[1] != "":
+                dr_accts.append(general_ledger.find_acct(row[1]))
+                dr_amnts.append(float(row[4]))
+            # Otherwise, add a credit item
+            elif row[2] != "":
+                cr_accts.append(general_ledger.find_acct(row[2]))
+                cr_amnts.append(float(row[5]))
+
+            if trans_complete == True:
+                transaction = Transaction(dr_accts, cr_accts, dr_amnts, cr_amnts, trans_date, explanation)
+                print(f"Adding: {transaction.summarize()}")
+                journal_entries.append(transaction)
+                trans_complete = False
+                dr_accts = []
+                cr_accts = []
+                dr_amnts = []
+                cr_amnts = []
 
 # Main program loop
 choice = ""
 while choice != "Exit":
-    main_menu_options = ["Create Journal Entry",
+    main_menu_options = ["Import Journal Entries",
+                        "Create Journal Entry",
                         "Post all Journal Entries",
                         "Prepare Trial Balance",
                         "Adjust Journal Entries",
@@ -108,4 +192,7 @@ while choice != "Exit":
         general_ledger.get_trial_bal()
         print("Trial Balance Generated!")
     elif choice == "Adjust Journal Entries":
-        print("Functionality not implemented!")
+        adjust_entry()
+    elif choice == "Import Journal Entries":
+        file = input("Enter path/name of journal file (Default: general_journal.csv)\n>>>")
+        import_entries(file)

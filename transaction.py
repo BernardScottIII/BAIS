@@ -14,7 +14,6 @@ class Transaction:
         
         self.acct_dr = []
         self.acct_cr = []
-        self.amount = []
 
         # Turn every account into an item within the transaction
         i = 0
@@ -61,8 +60,6 @@ class Transaction:
         entries.extend(self.cr_items())
         entries.extend([["",f"({self.explanation})"]])
 
-        print(entries)
-
         # Insert date into appropriate cell
         entries[0][0] = self.date
 
@@ -77,16 +74,20 @@ class Transaction:
             item.account().dr(item.amount(), self.date)
         for item in self.acct_cr:
             item.account().cr(item.amount(), self.date)
-        
+    
+    # Returns a cursory summary of the accounts involved in the transaction
     def summarize(self):
         result = "Transaction: "
         for item in self.acct_dr:
             result += f"{item.title()}, "
-        result += " <==> "
+        result += f" <==> "
         for item in self.acct_cr:
             result += f"{item.title()}, "
         return result
 
+# An Item is a component of a transaction. It contains a reference to the
+# specified account, and the amount its account is being debited or
+# credited.
 class Item:
     def __init__(self,
                  acct:Account,
@@ -94,11 +95,14 @@ class Item:
         self.acct = acct
         self.amnt = amnt
     
+    # Return title of account the Item references
     def title(self):
         return self.acct.acct_title()
     
+    # Return amount the account is being debited or credited
     def amount(self):
         return self.amnt
     
+    # Return a reference to the Item's account
     def account(self):
         return self.acct

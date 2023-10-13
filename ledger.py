@@ -86,3 +86,7 @@ class Ledger:
             return self.sorted_order.index(acct.acct_title())
         else:
             return -1
+    
+    # Given a valid account title, return a reference to that account
+    def find_acct(self, acct_name:str):
+        return self.accounts[self.sorted_order.index(acct_name)]
