@@ -139,7 +139,13 @@ def import_entries(filename:str):
         # Flag determining when complete transaction is read from journal
         trans_complete = False
 
+        header_skipped = False
+
         for row in reader:
+
+            if header_skipped == False:
+                header_skipped = True
+                continue
             
             trans_date = date.today()
             explanation = ""
